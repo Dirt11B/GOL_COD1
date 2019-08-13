@@ -21,6 +21,11 @@ namespace Warren_Brandon_GOL
         // The scratch pad array
         bool[,] scratchPad = new bool[25, 25];
 
+        // To contain the cell's data
+        static int columns = 25;
+        static int rows = 25;
+        string[,] cellData = new string[columns, rows];
+
         // Drawing colors
         Color gridColor = Color.Black;
         Color cellColor = Color.Gray;
@@ -35,16 +40,81 @@ namespace Warren_Brandon_GOL
         {
             InitializeComponent();
 
+            //application title
+            this.Text = Properties.Resources.AppTitle;
+
             // Setup the timer
             timer.Interval = 100; // milliseconds
             timer.Tick += Timer_Tick;
             timer.Enabled = true; // start timer running
         }
 
+        // Figures out how many neighbors each cell has
+        private void Neighbors()
+        {
+            for(int row = 0; row < rows; row++)
+            {
+                for (int col = 0; col < columns; col++)
+                {
+                    int neighbors = 0;
+                    for(int i = row - 1; i < row + 2; i++)
+                    {
+                        for(int j = col - 1; j < col + 2; j++)
+                        {
+                            try
+                            {
+                                if (i == row && j == col)
+                                {
+                                    neighbors += 0;
+                                }
+                                //else if "Alive")
+                                else if (universe[j,i] == true)
+                                {
+                                    neighbors += 1;
+                                }
+                            }
+                            catch(Exception e)
+                            {
+                                neighbors += 0;
+                            }
+                        }
+                    }
+                    cellData[col, row] = neighbors.ToString();
+                } // crashes here
+            }
+        }
+
+        // Update the universe to the next generation
+        private void UpdateUniverse()
+        {
+            int cellWidth = graphicsPanel1.ClientSize.Width / universe.GetLength(0);
+            int cellHeight = graphicsPanel1.ClientSize.Height / universe.GetLength(1);
+            foreach (Control cell in graphicsPanel1.Controls)
+            {
+                int xInd = cell.Left / cellWidth;
+                int yInd = cell.Top / cellHeight;
+                int neighbors = Convert.ToInt32(cellData[xInd, yInd]);
+                if (neighbors < 2 | neighbors > 3)
+                {
+                    //Dead
+                    universe[xInd, yInd] = false;
+                    cell.BackColor = Color.White;
+                }
+                if (neighbors == 3)
+                {
+                    //alive
+                    universe[xInd, yInd] = true;
+                    cell.BackColor = cellColor;
+                }
+            }
+        }
+
+
         // Calculate the next generation of cells
         private void NextGeneration()
         {
-
+            Neighbors();
+            UpdateUniverse();
 
             // Increment generation count
             generations++;
@@ -141,6 +211,11 @@ namespace Warren_Brandon_GOL
             }
             // Tell Windows you need to repaint
             graphicsPanel1.Invalidate();
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+
         }
     }
 }

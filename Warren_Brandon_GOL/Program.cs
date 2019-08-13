@@ -14,9 +14,9 @@ namespace Warren_Brandon_GOL
         [STAThread]
         static void Main()
         {
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new Form1());
+            Application.EnableVisualStyles(); // enabling shell styles
+            Application.SetCompatibleTextRenderingDefault(false); 
+            Application.Run(new Form1()); //form is instantiated here***
         }
     }
 }
