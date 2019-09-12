@@ -51,7 +51,7 @@
             this.toolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
-            this.newToolStripButton = new System.Windows.Forms.ToolStripButton();
+            this.NewStrip = new System.Windows.Forms.ToolStripButton();
             this.openToolStripButton = new System.Windows.Forms.ToolStripButton();
             this.saveToolStripButton = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator6 = new System.Windows.Forms.ToolStripSeparator();
@@ -105,7 +105,7 @@
             this.newToolStripMenuItem.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.newToolStripMenuItem.Name = "newToolStripMenuItem";
             this.newToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.N)));
-            this.newToolStripMenuItem.Size = new System.Drawing.Size(146, 22);
+            this.newToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.newToolStripMenuItem.Text = "&New";
             this.newToolStripMenuItem.Click += new System.EventHandler(this.NewToolStripMenuItem_Click);
             // 
@@ -168,8 +168,9 @@
             // exitToolStripMenuItem
             // 
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(146, 22);
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.exitToolStripMenuItem.Text = "E&xit";
+            this.exitToolStripMenuItem.Click += new System.EventHandler(this.ExitToolStripMenuItem_Click);
             // 
             // toolsToolStripMenuItem
             // 
@@ -236,7 +237,7 @@
             // toolStrip1
             // 
             this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.newToolStripButton,
+            this.NewStrip,
             this.openToolStripButton,
             this.saveToolStripButton,
             this.toolStripSeparator6,
@@ -253,14 +254,15 @@
             this.toolStrip1.TabIndex = 1;
             this.toolStrip1.Text = "toolStrip1";
             // 
-            // newToolStripButton
+            // NewStrip
             // 
-            this.newToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.newToolStripButton.Image = ((System.Drawing.Image)(resources.GetObject("newToolStripButton.Image")));
-            this.newToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.newToolStripButton.Name = "newToolStripButton";
-            this.newToolStripButton.Size = new System.Drawing.Size(23, 22);
-            this.newToolStripButton.Text = "&New";
+            this.NewStrip.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.NewStrip.Image = ((System.Drawing.Image)(resources.GetObject("NewStrip.Image")));
+            this.NewStrip.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.NewStrip.Name = "NewStrip";
+            this.NewStrip.Size = new System.Drawing.Size(23, 22);
+            this.NewStrip.Text = "&New";
+            this.NewStrip.Click += new System.EventHandler(this.NewStrip_Click);
             // 
             // openToolStripButton
             // 
@@ -325,6 +327,7 @@
             this.startButton.Name = "startButton";
             this.startButton.Size = new System.Drawing.Size(23, 22);
             this.startButton.Text = "Start";
+            this.startButton.Click += new System.EventHandler(this.StartButton_Click);
             // 
             // pauseButton
             // 
@@ -334,6 +337,7 @@
             this.pauseButton.Name = "pauseButton";
             this.pauseButton.Size = new System.Drawing.Size(23, 22);
             this.pauseButton.Text = "Pause";
+            this.pauseButton.Click += new System.EventHandler(this.PauseButton_Click);
             // 
             // nextButton
             // 
@@ -343,6 +347,7 @@
             this.nextButton.Name = "nextButton";
             this.nextButton.Size = new System.Drawing.Size(23, 22);
             this.nextButton.Text = "Next";
+            this.nextButton.Click += new System.EventHandler(this.NextButton_Click);
             // 
             // statusStrip1
             // 
@@ -421,7 +426,7 @@
         private System.Windows.Forms.ToolStripMenuItem searchToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator5;
         private System.Windows.Forms.ToolStripMenuItem aboutToolStripMenuItem;
-        private System.Windows.Forms.ToolStripButton newToolStripButton;
+        private System.Windows.Forms.ToolStripButton NewStrip;
         private System.Windows.Forms.ToolStripButton openToolStripButton;
         private System.Windows.Forms.ToolStripButton saveToolStripButton;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator6;

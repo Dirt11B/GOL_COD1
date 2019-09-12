@@ -16,19 +16,24 @@ namespace Warren_Brandon_GOL
     public partial class Form1 : Form
     {
         // The universe array
-        bool[,] universe = new bool[25, 25];
+        bool[,] universe = new bool[20, 20];
 
         // The scratch pad array
-        bool[,] scratchPad = new bool[25, 25];
+        bool[,] scratchPad = new bool[20, 20];
 
         // To contain the cell's data
+        const int Alive = 1;
+        const int Dead = 0;
         static int columns = 25;
         static int rows = 25;
         string[,] cellData = new string[columns, rows];
 
+        int neighbors = 0;
+        bool neighborDisplay = true;
+
         // Drawing colors
-        Color gridColor = Color.Black;
-        Color cellColor = Color.Gray;
+        Color gridColor;
+        Color cellColor;
 
         // The Timer class
         Timer timer = new Timer();
@@ -43,84 +48,87 @@ namespace Warren_Brandon_GOL
             //application title
             this.Text = Properties.Resources.AppTitle;
 
+            //window size
+            Size = new Size(700, 650);
+
             // Setup the timer
-            timer.Interval = 100; // milliseconds
+            timer.Interval = Properties.Settings.Default.Time;
             timer.Tick += Timer_Tick;
-            timer.Enabled = true; // start timer running
+            timer.Enabled = false; // start timer running
+            gridColor = Properties.Settings.Default.GridColor;
+            cellColor = Properties.Settings.Default.CellColor;
+
         }
 
         // Figures out how many neighbors each cell has
-        private void Neighbors()
+        public int Neighbors(int cellX, int cellY)
         {
-            for(int row = 0; row < rows; row++)
+            int isAlive = 0;
+            // checking for boundries
+            for (int y = cellY - 1; y <= cellY + 1; y++)
             {
-                for (int col = 0; col < columns; col++)
+                int yNeighbor = y;
+                if (y < 0)
                 {
-                    int neighbors = 0;
-                    for(int i = row - 1; i < row + 2; i++)
+                    yNeighbor = universe.GetLength(1) - 1;
+                }
+                else if (y > universe.GetLength(1) - 1)
+                {
+                    yNeighbor = 0;
+                }
+                for (int x = cellX - 1; x <= cellX + 1; x++)
+                {
+                    int xNeighbor = x;
+                    if (x < 0)
                     {
-                        for(int j = col - 1; j < col + 2; j++)
-                        {
-                            try
-                            {
-                                if (i == row && j == col)
-                                {
-                                    neighbors += 0;
-                                }
-                                //else if "Alive")
-                                else if (universe[j,i] == true)
-                                {
-                                    neighbors += 1;
-                                }
-                            }
-                            catch(Exception e)
-                            {
-                                neighbors += 0;
-                            }
-                        }
+                        xNeighbor = universe.GetLength(0) - 1;
                     }
-                    cellData[col, row] = neighbors.ToString();
-                } // crashes here
-            }
-        }
-
-        // Update the universe to the next generation
-        private void UpdateUniverse()
-        {
-            int cellWidth = graphicsPanel1.ClientSize.Width / universe.GetLength(0);
-            int cellHeight = graphicsPanel1.ClientSize.Height / universe.GetLength(1);
-            foreach (Control cell in graphicsPanel1.Controls)
-            {
-                int xInd = cell.Left / cellWidth;
-                int yInd = cell.Top / cellHeight;
-                int neighbors = Convert.ToInt32(cellData[xInd, yInd]);
-                if (neighbors < 2 | neighbors > 3)
-                {
-                    //Dead
-                    universe[xInd, yInd] = false;
-                    cell.BackColor = Color.White;
-                }
-                if (neighbors == 3)
-                {
-                    //alive
-                    universe[xInd, yInd] = true;
-                    cell.BackColor = cellColor;
+                    else if (x > universe.GetLength(0) - 1)
+                    {
+                        xNeighbor = 0;
+                    }
+                    if (universe[xNeighbor, yNeighbor] == true && (x != cellX || y != cellY))
+                    {
+                        isAlive++;
+                    }
                 }
             }
+            return isAlive;
         }
-
-
         // Calculate the next generation of cells
         private void NextGeneration()
         {
-            Neighbors();
-            UpdateUniverse();
-
-            // Increment generation count
             generations++;
 
-            // Update status strip generations
-            toolStripStatusLabelGenerations.Text = "Generations = " + generations.ToString();
+            // Rules
+            for (int y = 0; y < universe.GetLength(1); y++)
+            {
+                for (int x = 0; x < universe.GetLength(0); x++)
+                {
+                    neighbors = Neighbors(x, y);
+                    if (universe[x, y] == true)
+                    {
+                        if (neighbors < 2)
+                        {
+                            scratchPad[x, y] = false;
+                        }
+                        else if (neighbors > 3)
+                        {
+                            scratchPad[x, y] = false;
+                        }
+                        else if (neighbors == 2 || neighbors == 3)
+                        {
+                            scratchPad[x, y] = true;
+                        }
+                    }
+                    else if (universe[x, y] == false && neighbors == 3)
+                    {
+                        scratchPad[x, y] = true;
+                    }
+                }
+            }
+            universe = (bool[,])scratchPad.Clone();
+            graphicsPanel1.Invalidate();
         }
 
         // The event called by the timer every Interval milliseconds.
@@ -159,17 +167,37 @@ namespace Warren_Brandon_GOL
                     cellRect.Width = cellWidth;
                     cellRect.Height = cellHeight;
 
+                    // Outline the cell with a pen
+                    e.Graphics.DrawRectangle(gridPen, cellRect.X, cellRect.Y, cellRect.Width, cellRect.Height);
+
                     // Fill the cell with a brush if alive
                     if (universe[x, y] == true)
                     {
                         e.Graphics.FillRectangle(cellBrush, cellRect);
                     }
-
-                    // Outline the cell with a pen
-                    e.Graphics.DrawRectangle(gridPen, cellRect.X, cellRect.Y, cellRect.Width, cellRect.Height);
+                    if (scratchPad[x, y] == true)
+                    {
+                        e.Graphics.FillRectangle(cellBrush, cellRect);
+                    }
+                    else if (neighborDisplay == true)
+                    {
+                        Brush brush = Brushes.Green;
+                        neighbors = Neighbors(x, y);
+                        if (neighbors >= 3)
+                        {
+                            brush = Brushes.Red;
+                        }
+                        StringFormat format = new StringFormat();
+                        format.Alignment = StringAlignment.Center;
+                        format.LineAlignment = StringAlignment.Center;
+                        Rectangle rectangle = new Rectangle(cellRect.X, cellRect.Y, cellRect.Width, cellRect.Height);
+                        if (neighbors != 0)
+                        {
+                            e.Graphics.DrawString(neighbors.ToString(), Font, brush, rectangle, format);
+                        }
+                    }
                 }
             }
-
             // Cleaning up pens and brushes (helps garbage collector)
             gridPen.Dispose();
             cellBrush.Dispose();
@@ -200,22 +228,63 @@ namespace Warren_Brandon_GOL
 
         private void NewToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            // Iterate through the universe in the y, top to bottom
             for (int y = 0; y < universe.GetLength(1); y++)
             {
                 // Iterate through the universe in the x, left to right
                 for (int x = 0; x < universe.GetLength(0); x++)
                 {
                     universe[x, y] = false;
+                    scratchPad[x, y] = false;
+                    // resets the generation count to 0
+                    generations = 0;
+                    toolStripStatusLabelGenerations.Text = "Generations = " + generations.ToString();
+                    // Tells windows to repaint
+                    graphicsPanel1.Invalidate();
                 }
             }
-            // Tell Windows you need to repaint
-            graphicsPanel1.Invalidate();
         }
 
         private void Form1_Load(object sender, EventArgs e)
         {
 
+        }
+
+        private void StartButton_Click(object sender, EventArgs e)
+        {
+            timer.Enabled = true;
+        }
+
+        private void PauseButton_Click(object sender, EventArgs e)
+        {
+            timer.Enabled = false;
+        }
+
+        private void NextButton_Click(object sender, EventArgs e)
+        {
+            NextGeneration();
+        }
+
+        private void ExitToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Close();
+        }
+
+        private void NewStrip_Click(object sender, EventArgs e)
+        {
+            for (int y = 0; y < universe.GetLength(1); y++)
+            {
+                // Iterate through the universe in the x, left to right
+                for (int x = 0; x < universe.GetLength(0); x++)
+                {
+                    universe[x, y] = false;
+                    scratchPad[x, y] = false;
+                    // resets the generation count to 0
+                    generations = 0;
+                    toolStripStatusLabelGenerations.Text = "Generations = " + generations.ToString();
+                    // Tells windows to repaint
+                    graphicsPanel1.Invalidate();
+                }
+            }
         }
     }
 }
